@@ -9,7 +9,7 @@ router.param('country_iso_code', function(req, res, next, country) {
 });
 
 router.get('/:country_iso_code', (req, res, next) => {
-    UserModel.find({country: req.country}, 'rank points display_name country').sort({'points' : -1}).exec(function(err, docs) {
+    UserModel.find({country: req.country}).sort({'points' : -1}).select('rank points display_name country -_id').exec(function(err, docs) {
         if (err) {
             res.send(err);
         } else {
@@ -19,7 +19,7 @@ router.get('/:country_iso_code', (req, res, next) => {
 });
 
 router.get('/', (req, res, next) => {
-    UserModel.find({}, 'rank points display_name country').sort({'points' : -1}).exec(function(err, docs) {
+    UserModel.find({}).sort({'points' : -1}).select('rank points display_name country -_id').exec(function(err, docs) {
         if (err) {
             res.send(err);
         } else {

@@ -19,18 +19,22 @@ router.post('/submit', (req, res, next) => {
                 "timestamp": new Date().getTime()
             });
         } else {
-            UserModel.find({'_id' : { $ne: mongoose.Types.ObjectId(id) }, 'points': { $gt: score } }, function(err, docs) {
+            UserModel.find({'_id' : { $ne: mongoose.Types.ObjectId(id) }, 'points': { $gte: score } }, function(err, docs) {
                 console.log(docs);
                 var newRank;
 
                 newRank = docs.length + 1;
 
+                const greater = score > doc.points ? score : doc.points;
+                const less = score < doc.points ? score : doc.points;
+                const diff = score > doc.points ? 1 : -1;
+                
                 UserModel.bulkWrite(
                     [
                         {
                             updateMany: {
-                                filter: { "rank": { $lt: doc.rank}, "points": { $lt: score }},
-                                update: { $inc: { 'rank' : 1 } }
+                                filter: { '_id' : {$ne: mongoose.Types.ObjectId(id)}, $and: [ { 'points' : {$gte: less} }, { 'points' : {$lte: greater} } ]},
+                                update: { $inc: { 'rank' : diff } }
                             }
                         },
                         {
